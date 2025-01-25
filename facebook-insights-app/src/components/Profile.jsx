@@ -102,6 +102,12 @@ const Profile = ({ accessToken }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [dateRange, setDateRange] = useState("last7days");
+  const [customDateRange, setCustomDateRange] = useState({
+    startDate: null,
+    endDate: null,
+  });
+
   useEffect(() => {
     // Update time every second
     const timer = setInterval(() => {
@@ -235,6 +241,11 @@ const Profile = ({ accessToken }) => {
           params: {
             pageAccessToken,
             pageId: selectedPage,
+            dateRange,
+            ...(dateRange === "custom" && {
+              startDate: customDateRange.startDate,
+              endDate: customDateRange.endDate,
+            }),
           },
         }
       );
@@ -378,6 +389,69 @@ const Profile = ({ accessToken }) => {
                   </>
                 )}
               </button>
+            </div>
+          </div>
+          <div className="bg-white rounded-2xl shadow-lg p-6 mt-4">
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Advanced Post Filters
+              </h3>
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex-grow">
+                  <select
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 
+          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-200 text-gray-700"
+                    value={dateRange}
+                    onChange={(e) => setDateRange(e.target.value)}
+                  >
+                    <option value="last7days">Last 7 Days</option>
+                    <option value="lifetime">Lifetime</option>
+                    <option value="custom">Custom Range</option>
+                  </select>
+                </div>
+
+                {dateRange === "custom" && (
+                  <>
+                    <div className="flex items-center space-x-2">
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">
+                          Start Date
+                        </label>
+                        <input
+                          type="date"
+                          className="px-3 py-2 border border-gray-200 rounded-xl bg-gray-50 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={customDateRange.startDate || ""}
+                          onChange={(e) =>
+                            setCustomDateRange((prev) => ({
+                              ...prev,
+                              startDate: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">
+                          End Date
+                        </label>
+                        <input
+                          type="date"
+                          className="px-3 py-2 border border-gray-200 rounded-xl bg-gray-50 
+                focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          value={customDateRange.endDate || ""}
+                          onChange={(e) =>
+                            setCustomDateRange((prev) => ({
+                              ...prev,
+                              endDate: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

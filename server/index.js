@@ -126,7 +126,7 @@ app.get("/api/page-metrics", async (req, res) => {
 });
 
 app.get("/api/page-posts", async (req, res) => {
-  const { pageAccessToken, pageId } = req.query;
+  const { pageAccessToken, pageId, dateRange } = req.query;
   const limit = req.query.limit || 10; // Default to 10 posts
 
   // Validate required parameters
@@ -139,14 +139,37 @@ app.get("/api/page-posts", async (req, res) => {
     validateStatus: (status) => status < 500,
   };
 
+  // Date range filtering logic
+  const getDateFilter = (dateRange) => {
+    const now = new Date();
+    switch (dateRange) {
+      case "last7days":
+        return new Date(now.setDate(now.getDate() - 7)).toISOString();
+      case "lifetime":
+        return null; // No date filter
+      case "custom":
+        // Expect start and end dates to be passed separately
+        return req.query.startDate ? req.query.startDate : null;
+      default:
+        return null;
+    }
+  };
+
+  const dateFilter = getDateFilter(dateRange);
+
   try {
-    const response = await axios.get(
+    let apiUrl =
       `https://graph.facebook.com/v12.0/${pageId}/posts?` +
-        `fields=id,message,created_time,permalink_url,attachments,reactions.summary(total_count),comments.summary(total_count),shares&` +
-        `limit=${limit}&` +
-        `access_token=${pageAccessToken}`,
-      axiosConfig
-    );
+      `fields=id,message,created_time,permalink_url,attachments,reactions.summary(total_count),comments.summary(total_count),shares&` +
+      `limit=${limit}&` +
+      `access_token=${pageAccessToken}`;
+
+    // Add date filtering if applicable
+    if (dateFilter) {
+      apiUrl += `&since=${dateFilter}`;
+    }
+
+    const response = await axios.get(apiUrl, axiosConfig);
 
     const posts = response.data.data.map((post) => ({
       id: post.id,
