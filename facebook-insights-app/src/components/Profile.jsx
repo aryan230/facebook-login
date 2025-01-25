@@ -364,7 +364,7 @@ const Profile = ({ accessToken }) => {
                 className="px-6 py-3 bg-blue-600 text-white rounded-xl
                          hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 
                          disabled:cursor-not-allowed flex items-center justify-center space-x-2
-                         min-w-[160px]"
+                         min-w-[160px] hover:cursor-pointer"
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">

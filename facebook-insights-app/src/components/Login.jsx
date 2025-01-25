@@ -33,7 +33,7 @@ const Login = ({ onLogin }) => {
                 className="w-full bg-blue-600 text-white py-3 rounded-lg 
                            hover:bg-blue-700 transition-colors duration-300 
                            flex items-center justify-center 
-                           space-x-3 shadow-md hover:shadow-lg"
+                           space-x-3 shadow-md hover:shadow-lg hover:cursor-pointer"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
