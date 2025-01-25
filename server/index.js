@@ -125,4 +125,54 @@ app.get("/api/page-metrics", async (req, res) => {
   }
 });
 
+app.get("/api/page-posts", async (req, res) => {
+  const { pageAccessToken, pageId } = req.query;
+  const limit = req.query.limit || 10; // Default to 10 posts
+
+  // Validate required parameters
+  if (!pageAccessToken || !pageId) {
+    return res.status(400).json({ message: "Missing required parameters" });
+  }
+
+  const axiosConfig = {
+    timeout: 5000,
+    validateStatus: (status) => status < 500,
+  };
+
+  try {
+    const response = await axios.get(
+      `https://graph.facebook.com/v12.0/${pageId}/posts?` +
+        `fields=id,message,created_time,permalink_url,attachments,reactions.summary(total_count),comments.summary(total_count),shares&` +
+        `limit=${limit}&` +
+        `access_token=${pageAccessToken}`,
+      axiosConfig
+    );
+
+    const posts = response.data.data.map((post) => ({
+      id: post.id,
+      message: post.message || "",
+      createdAt: post.created_time,
+      url: post.permalink_url,
+      media: post.attachments?.data?.[0],
+      reactions: post.reactions?.summary?.total_count || 0,
+      comments: post.comments?.summary?.total_count || 0,
+      shares: post.shares?.count || 0,
+    }));
+
+    res.status(200).json({
+      posts,
+      paging: response.data.paging || null,
+    });
+  } catch (error) {
+    console.error(
+      "Error fetching page posts:",
+      error.response?.data || error.message
+    );
+    res.status(error.response?.status || 500).json({
+      message: "Error fetching page posts",
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

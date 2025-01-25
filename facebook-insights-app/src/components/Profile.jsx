@@ -11,6 +11,86 @@ import {
   FaIdBadge,
 } from "react-icons/fa";
 import { format } from "date-fns";
+import { FiExternalLink } from "react-icons/fi";
+import { BiLike, BiComment, BiShare } from "react-icons/bi";
+
+const PostCard = ({ post }) => (
+  <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+    <div className="p-6">
+      {/* Post Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white">
+            <FaFacebookF />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-800">Facebook Post</h3>
+            <p className="text-sm text-gray-500">
+              {new Date(post.createdAt).toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div>
+        </div>
+        <a
+          href={post.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:text-blue-600 transition-colors p-2 hover:bg-blue-50 rounded-lg"
+        >
+          <FiExternalLink className="text-xl" />
+        </a>
+      </div>
+
+      {/* Post Media */}
+      {post.media?.media?.image && (
+        <div className="mb-4 rounded-xl overflow-hidden bg-gray-100">
+          <img
+            src={post.media.media.image.src}
+            alt="Post content"
+            className="w-full h-auto object-cover"
+            style={{
+              aspectRatio: `${post.media.media.image.width} / ${post.media.media.image.height}`,
+              maxHeight: "500px",
+            }}
+          />
+        </div>
+      )}
+
+      {/* Post Content */}
+      {post.message && (
+        <div className="mb-4">
+          <p className="text-gray-700 leading-relaxed">{post.message}</p>
+        </div>
+      )}
+
+      {/* Post Stats */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2 text-gray-600">
+            <BiLike className="text-xl" />
+            <span className="text-sm font-medium">{post.reactions}</span>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-600">
+            <BiComment className="text-xl" />
+            <span className="text-sm font-medium">{post.comments}</span>
+          </div>
+          <div className="flex items-center space-x-2 text-gray-600">
+            <BiShare className="text-xl" />
+            <span className="text-sm font-medium">{post.shares}</span>
+          </div>
+        </div>
+        <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium">
+          {post.media?.type || "Post"}
+        </span>
+      </div>
+    </div>
+  </div>
+);
 
 const Profile = ({ accessToken }) => {
   const [profile, setProfile] = useState(null);
@@ -21,7 +101,7 @@ const Profile = ({ accessToken }) => {
   const [fol, setFol] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const [posts, setPosts] = useState([]);
   useEffect(() => {
     // Update time every second
     const timer = setInterval(() => {
@@ -147,6 +227,18 @@ const Profile = ({ accessToken }) => {
           },
         ]);
       }
+
+      //Fetch all posts
+      const postsResponse = await axios.get(
+        "https://facebook-login-cm0u.onrender.com/api/page-posts",
+        {
+          params: {
+            pageAccessToken,
+            pageId: selectedPage,
+          },
+        }
+      );
+      setPosts(postsResponse.data.posts);
     } catch (error) {
       setError(
         error.response?.data?.error?.message || "Failed to fetch page metrics"
@@ -313,6 +405,63 @@ const Profile = ({ accessToken }) => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+        {selectedPage && posts.length > 0 && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-semibold text-gray-800">
+                Recent Posts
+              </h3>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-500">
+                  Total Posts: {posts.length}
+                </span>
+                <select
+                  className="text-sm border border-gray-200 rounded-lg px-3 py-1.5"
+                  onChange={(e) => {
+                    // Add sorting logic here
+                  }}
+                >
+                  <option value="newest">Newest First</option>
+                  <option value="oldest">Oldest First</option>
+                  <option value="popular">Most Popular</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Posts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {posts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {posts.length >= 10 && (
+              <div className="text-center">
+                <button
+                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl
+                   hover:bg-gray-200 transition-all duration-200
+                   inline-flex items-center space-x-2"
+                >
+                  <span>Load More Posts</span>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
