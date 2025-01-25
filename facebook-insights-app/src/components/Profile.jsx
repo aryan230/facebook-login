@@ -20,7 +20,7 @@ const Profile = ({ accessToken }) => {
   const [metrics, setMetrics] = useState(null);
   const [fol, setFol] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("null");
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Update time every second
@@ -73,7 +73,7 @@ const Profile = ({ accessToken }) => {
     try {
       // Fetch Page Access Token
       const pageAccessTokenResponse = await axios.get(
-        "http://localhost:5000/api/page-access-token",
+        "https://facebook-login-cm0u.onrender.com/api/page-access-token",
         {
           params: {
             userAccessToken: accessToken,
@@ -86,7 +86,7 @@ const Profile = ({ accessToken }) => {
 
       // Fetch Page Metrics
       const metricsResponse = await axios.get(
-        "http://localhost:5000/api/page-metrics",
+        "https://facebook-login-cm0u.onrender.com/api/page-metrics",
         {
           params: {
             pageAccessToken,
