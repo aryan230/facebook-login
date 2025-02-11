@@ -26,13 +26,13 @@ const PostCard = ({ post }) => (
           <div>
             <h3 className="font-semibold text-gray-800">Facebook Post</h3>
             <p className="text-sm text-gray-500">
-              {new Date(post.createdAt).toLocaleDateString("en-US", {
+              {/* {new Date(post.createdAt).toLocaleDateString("en-US", {
                 day: "numeric",
                 month: "short",
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
-              })}
+              })} */}
             </p>
           </div>
         </div>
@@ -474,7 +474,7 @@ const Profile = ({ accessToken }) => {
                     {metric.label}
                   </p>
                   <p className={`text-3xl font-bold ${metric.textColor}`}>
-                    {metric.value.toLocaleString()}
+                    {/* {metric.value.toLocaleString()} */}
                   </p>
                 </div>
               </div>
