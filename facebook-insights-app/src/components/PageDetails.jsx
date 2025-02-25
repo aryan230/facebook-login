@@ -275,7 +275,7 @@ const Profile = ({ accessToken }) => {
                     {metric.label}
                   </h3>
                   <p className={`text-3xl font-bold ${metric.textColor}`}>
-                    {/* {metric?.value?.toLocaleString()} */}
+                    {metric?.value?.toLocaleString()}
                   </p>
                 </div>
               </div>
