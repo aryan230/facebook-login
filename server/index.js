@@ -150,7 +150,6 @@ app.get("/api/page-metrics", async (req, res) => {
   }
 });
 
-// Helper function to process insights data
 function processInsightsData(insightsData) {
   const processed = {};
 
